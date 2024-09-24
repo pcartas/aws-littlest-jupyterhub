@@ -3,7 +3,7 @@ from traitlets import Dict, List, Unicode
 
 from tljh import user
 from tljh.normalize import generate_system_username
-
+from tljh.config import USERNAME_PREFIX
 
 class UserCreatingSpawner(SystemdSpawner):
     """
@@ -19,7 +19,7 @@ class UserCreatingSpawner(SystemdSpawner):
         Perform system user activities before starting server
         """
         # FIXME: Move this elsewhere? Into the Authenticator?
-        system_username = generate_system_username("jupyter-" + self.user.name)
+        system_username = generate_system_username(USERNAME_PREFIX + self.user.name)
 
         # FIXME: This is a hack. Allow setting username directly instead
         self.username_template = system_username

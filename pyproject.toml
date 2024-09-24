@@ -64,7 +64,7 @@ omit = [
 # ref: https://github.com/your-tools/tbump#readme
 #
 [tool.tbump]
-github_url = "https://github.com/jupyterhub/the-littlest-jupyterhub"
+github_url = "https://github.com/pcartas/aws-littlest-jupyterhub"
 
 [tool.tbump.version]
 current = "1.0.1.dev"

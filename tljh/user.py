@@ -33,6 +33,29 @@ def ensure_user(username):
     pm = get_plugin_manager()
     pm.hook.tljh_new_user_create(username=username)
 
+def ensure_user_with_s3(username, s3_bucket_dir, iam_role):
+    """
+    Make sure a given user exists
+    """
+    # Check if user exists
+    try:
+        pwd.getpwnam(username)
+        # User exists, nothing to do!
+        return
+    except KeyError:
+        # User doesn't exist, time to create!
+        pass
+
+    subprocess.check_call(["useradd", "--create-home", username])
+
+    subprocess.check_call(["chmod", "o-rwx", expanduser(f"~{username}")])
+
+    if s3_bucket_dir and iam_role:
+        subprocess.call(["s3fs", s3_bucket_dir, expanduser(f"~{username}"), "-o", f"iam_role={iam_role}", "-o", "allow_other", "-o", "dbglevel=debug", "-o", "url=https://s3.amazonaws.com", "-o", "nonempty"])
+
+    pm = get_plugin_manager()
+    pm.hook.tljh_new_user_create(username=username)
+
 
 def remove_user(username):
     """

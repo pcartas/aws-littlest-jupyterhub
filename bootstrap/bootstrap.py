@@ -466,6 +466,7 @@ def main():
                 "python3",
                 "python3-venv",
                 "python3-pip",
+                "s3fs",
                 "git",
                 "sudo",  # sudo is missing in default debian install
             ],

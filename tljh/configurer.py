@@ -11,7 +11,7 @@ FIXME: A strong feeling that JSON Schema should be involved somehow.
 import os
 import sys
 
-from .config import CONFIG_FILE, STATE_DIR
+from .config import CONFIG_FILE, STATE_DIR, USERNAME_PREFIX
 from .yaml import yaml
 
 # Default configuration for tljh
@@ -244,7 +244,7 @@ def update_user_environment(c, config):
 
 
 def update_user_account_config(c, config):
-    c.SystemdSpawner.username_template = "jupyter-{USERNAME}"
+    c.SystemdSpawner.username_template = "{USERNAME_PREFIX}{USERNAME}"
 
 
 def update_traefik_api(c, config):

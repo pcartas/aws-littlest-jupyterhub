@@ -6,7 +6,7 @@ import os
 from glob import glob
 
 from tljh import configurer
-from tljh.config import CONFIG_DIR, INSTALL_PREFIX, USER_ENV_PREFIX
+from tljh.config import CONFIG_DIR, INSTALL_PREFIX, USER_ENV_PREFIX, USERNAME_PREFIX
 from tljh.user_creating_spawner import UserCreatingSpawner
 from tljh.utils import get_plugin_manager
 
@@ -28,7 +28,7 @@ c.JupyterHub.proxy_class = "traefik_file"
 c.SystemdSpawner.extra_paths = [os.path.join(USER_ENV_PREFIX, "bin")]
 c.SystemdSpawner.default_shell = "/bin/bash"
 # Drop the '-singleuser' suffix present in the default template
-c.SystemdSpawner.unit_name_template = "jupyter-{USERNAME}"
+c.SystemdSpawner.unit_name_template = "{USERNAME_PREFIX}{USERNAME}"
 
 tljh_config = configurer.load_config()
 configurer.apply_config(tljh_config, c)

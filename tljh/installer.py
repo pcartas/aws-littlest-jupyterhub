@@ -502,6 +502,14 @@ def ensure_config_yaml(plugin_manager):
     with open(CONFIG_FILE, "w+") as f:
         yaml.dump(config, f)
 
+def admin_s3_type(arg):
+    if ':' not in arg:
+        raise argparse.ArgumentTypeError("Los admins deben especificarse como usuario:bucket")
+    return tuple(arg.split(':', 1))
+
+def ensure_s3_mounts(admins_s3, iam_role):
+    for each in admins_s3:
+        user.ensure_user_with_s3(each[0], each[1], iam_role)
 
 def main():
     from .log import init_logging
@@ -512,6 +520,16 @@ def main():
     argparser.add_argument(
         "--admin", nargs="*", action="append", help="List of usernames set to be admin"
     )
+
+    argparser.add_argument(
+        "--admin-s3", nargs="*", type=admin_s3_type,
+        help="Lista de usuarios admin y sus buckets S3 en el formato usuario:bucket"
+    )
+
+    argparser.add_argument(
+        "--iam-role", help="IAM role to use for S3 bucket access"
+    )
+
     argparser.add_argument(
         "--user-requirements-txt-url",
         help="URL to a requirements.txt file that should be installed in the user environment",
@@ -528,7 +546,14 @@ def main():
     pm = setup_plugins(args.plugin)
 
     ensure_config_yaml(pm)
-    ensure_admins(args.admin)
+    # Create a list with args.admin and args.admin_s3
+    admins = []
+    if args.admin:
+        admins.extend(args.admin)
+    if args.admin_s3:
+        admins.extend(args.admin_s3)
+    ensure_admins(admins)
+    ensure_s3_mounts(args.admin_s3, args.iam_role)
     ensure_usergroups()
     if args.user_requirements_txt_url:
         logger.info("installing packages from user_requirements_txt_url")

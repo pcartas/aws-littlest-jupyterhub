@@ -43,7 +43,7 @@ html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
-            "url": "https://github.com/jupyterhub/the-littlest-jupyterhub",
+            "url": "https://github.com/pcartas/aws-littlest-jupyterhub",
             "icon": "fab fa-github-square",
         },
         {
@@ -108,8 +108,8 @@ linkcheck_ignore = [
     r"(.*)github\.com(.*)#",  # javascript based anchors
     r"(.*)/#%21(.*)/(.*)",  # /#!forum/jupyter - encoded anchor edge case
     r"https://github.com/[^/]*$",  # too many github usernames / searches in changelog
-    "https://github.com/jupyterhub/the-littlest-jupyterhub/pull/",  # too many PRs in changelog
-    "https://github.com/jupyterhub/the-littlest-jupyterhub/compare/",  # too many comparisons in changelog
+    "https://github.com/pcartas/aws-littlest-jupyterhub/pull/",  # too many PRs in changelog
+    "https://github.com/pcartas/aws-littlest-jupyterhub/compare/",  # too many comparisons in changelog
 ]
 linkcheck_anchors_ignore = [
     "/#!",

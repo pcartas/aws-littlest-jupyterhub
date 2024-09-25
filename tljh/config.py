@@ -32,8 +32,8 @@ USER_ENV_PREFIX = os.path.join(INSTALL_PREFIX, "user")
 STATE_DIR = os.path.join(INSTALL_PREFIX, "state")
 CONFIG_DIR = os.path.join(INSTALL_PREFIX, "config")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.yaml")
-USERNAME_PREFIX = os.environ.get("TLJH_USERNAME_PREFIX", "jupyter-")
-HASH_USERNAME = os.environ.get("TLJH_HASH_USERNAME", True)
+USERNAME_PREFIX = os.getenv("TLJH_USERNAME_PREFIX", "jupyter-")
+HASH_USERNAME = bool(os.getenv("TLJH_HASH_USERNAME", True))
 
 
 @contextmanager

@@ -580,7 +580,7 @@ def main():
         except Exception as e:
             logger.error(f"Couldn't stop the progress page server. Exception was {e}.")
 
-    ensure_jupyterhub_service(args.usernames_prefix, args.hash_usernames)
+    ensure_jupyterhub_service(args.usernames_prefix, args.hash_usernames.lower() == "true")
     ensure_jupyterhub_running()
     ensure_symlinks(HUB_ENV_PREFIX)
 

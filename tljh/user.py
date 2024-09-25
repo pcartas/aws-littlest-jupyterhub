@@ -47,15 +47,34 @@ def ensure_user_with_s3(username, s3_bucket_dir, iam_role):
         pass
 
     subprocess.check_call(["useradd", "--create-home", username])
-
     subprocess.check_call(["chmod", "o-rwx", expanduser(f"~{username}")])
 
+    user_info = pwd.getpwnam(username)
+    uid = user_info.pw_uid
+    gid = user_info.pw_gid
+    
     if s3_bucket_dir and iam_role:
-        # mkdir s3 bucket directory
-        subprocess.check_call(["mkdir", "-p", expanduser(f"~{username}/s3bucket")])
-        subprocess.check_call(["chmod", "o-rwx", expanduser(f"~{username}/s3bucket")])
-        subprocess.call(["s3fs", s3_bucket_dir, expanduser(f"~{username}/s3bucket"), "-o", f"iam_role={iam_role}", "-o", "complement_stat", "-o", "allow_other", "-o", "dbglevel=debug", "-o", "url=https://s3.amazonaws.com", "-o", "nonempty"])
-
+        user_home_dir = expanduser(f"~{username}")
+        s3_mount_dir = f"{user_home_dir}/s3bucket"
+        
+        # Create the S3 bucket directory for the user
+        subprocess.check_call(["mkdir", "-p", s3_mount_dir])
+        
+        # Set appropriate permissions on the mount directory
+        subprocess.check_call(["chmod", "o-rwx", s3_mount_dir])
+        
+        # Mount the S3 bucket with the correct uid and gid for the user
+        subprocess.call([
+            "s3fs", s3_bucket_dir, s3_mount_dir, 
+            "-o", f"iam_role={iam_role}", 
+            "-o", "complement_stat", 
+            "-o", "allow_other", 
+            "-o", f"uid={uid}", 
+            "-o", f"gid={gid}", 
+            "-o", "dbglevel=debug", 
+            "-o", "url=https://s3.amazonaws.com", 
+            "-o", "nonempty"
+        ])
     pm = get_plugin_manager()
     pm.hook.tljh_new_user_create(username=username)
 

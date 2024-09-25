@@ -1,5 +1,6 @@
 from systemdspawner import SystemdSpawner
 from traitlets import Dict, List, Unicode
+import os
 
 from tljh import user
 from tljh.normalize import generate_system_username
@@ -19,7 +20,7 @@ class UserCreatingSpawner(SystemdSpawner):
         Perform system user activities before starting server
         """
         # FIXME: Move this elsewhere? Into the Authenticator?
-        system_username = generate_system_username(USERNAME_PREFIX + self.user.name)
+        system_username = generate_system_username(os.getenv("TLJH_USERNAME_PREFIX", USERNAME_PREFIX) + self.user.name)
 
         # FIXME: This is a hack. Allow setting username directly instead
         self.username_template = system_username

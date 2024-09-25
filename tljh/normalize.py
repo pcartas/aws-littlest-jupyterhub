@@ -4,6 +4,7 @@ Functions to normalize various inputs
 
 import hashlib
 from tljh.config import HASH_USERNAME
+import os
 
 
 def generate_system_username(username):
@@ -25,7 +26,7 @@ def generate_system_username(username):
         str: The generated POSIX-compliant username.
     """
 
-    if HASH_USERNAME:
+    if os.getenv("TLJH_HASH_USERNAME", HASH_USERNAME):
         if len(username) < 26:
             return username
 

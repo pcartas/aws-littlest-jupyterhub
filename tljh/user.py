@@ -51,7 +51,10 @@ def ensure_user_with_s3(username, s3_bucket_dir, iam_role):
     subprocess.check_call(["chmod", "o-rwx", expanduser(f"~{username}")])
 
     if s3_bucket_dir and iam_role:
-        subprocess.call(["s3fs", s3_bucket_dir, expanduser(f"~{username}"), "-o", f"iam_role={iam_role}", "-o", "allow_other", "-o", "dbglevel=debug", "-o", "url=https://s3.amazonaws.com", "-o", "nonempty"])
+        # mkdir s3 bucket directory
+        subprocess.check_call(["mkdir", "-p", expanduser(f"~{username}/s3bucket")])
+        subprocess.check_call(["chmod", "o-rwx", expanduser(f"~{username}/s3bucket")])
+        subprocess.call(["s3fs", s3_bucket_dir, expanduser(f"~{username}/s3bucket"), "-o", f"iam_role={iam_role}", "-o", "allow_other", "-o", "dbglevel=debug", "-o", "url=https://s3.amazonaws.com", "-o", "nonempty"])
 
     pm = get_plugin_manager()
     pm.hook.tljh_new_user_create(username=username)

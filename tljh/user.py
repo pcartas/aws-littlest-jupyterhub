@@ -52,7 +52,7 @@ def ensure_user_with_s3(username, s3_bucket_dir, iam_role):
     user_info = pwd.getpwnam(username)
     uid = user_info.pw_uid
     gid = user_info.pw_gid
-    
+
     if s3_bucket_dir and iam_role:
         user_home_dir = expanduser(f"~{username}")
         s3_mount_dir = f"{user_home_dir}/s3bucket"
@@ -72,9 +72,11 @@ def ensure_user_with_s3(username, s3_bucket_dir, iam_role):
             "-o", f"uid={uid}", 
             "-o", f"gid={gid}", 
             "-o", "dbglevel=debug", 
+            "-o", "umask=002", 
             "-o", "url=https://s3.amazonaws.com", 
             "-o", "nonempty"
         ])
+
     pm = get_plugin_manager()
     pm.hook.tljh_new_user_create(username=username)
 

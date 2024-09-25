@@ -26,6 +26,8 @@ from .config import (
     INSTALL_PREFIX,
     STATE_DIR,
     USER_ENV_PREFIX,
+    HASH_USERNAME,
+    USERNAME_PREFIX,
 )
 from .utils import parse_version as V
 from .yaml import yaml
@@ -82,6 +84,8 @@ def ensure_jupyterhub_service(prefix):
         python_interpreter_path=sys.executable,
         jupyterhub_config_path=os.path.join(HERE, "jupyterhub_config.py"),
         install_prefix=INSTALL_PREFIX,
+        usernames_prefix=USERNAME_PREFIX,
+        hash_usernames=HASH_USERNAME
     )
     systemd.install_unit("jupyterhub.service", hub_unit_template.format(**unit_params))
     systemd.install_unit("traefik.service", traefik_unit_template.format(**unit_params))

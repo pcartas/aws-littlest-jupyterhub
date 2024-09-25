@@ -26,7 +26,7 @@ def generate_system_username(username):
         str: The generated POSIX-compliant username.
     """
 
-    if os.getenv("TLJH_HASH_USERNAME", HASH_USERNAME):
+    if os.getenv("TLJH_HASH_USERNAME", HASH_USERNAME).lower() == "true":
         if len(username) < 26:
             return username
 

@@ -546,12 +546,15 @@ def main():
     pm = setup_plugins(args.plugin)
 
     ensure_config_yaml(pm)
-    # Create a list with args.admin and args.admin_s3
+   
     admins = []
     if args.admin:
         admins.extend(args.admin)
-    if args.admin_s3:
-        admins.extend(args.admin_s3)
+    admin_s3_usernames = [admin_s3[0] for admin_s3 in args.admin_s3]
+    for admin in admin_s3_usernames:
+        if admin not in admins:
+            admins.append([admin])
+
     ensure_admins(admins)
     ensure_s3_mounts(args.admin_s3, args.iam_role)
     ensure_usergroups()

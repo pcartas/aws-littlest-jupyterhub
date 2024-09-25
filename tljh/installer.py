@@ -58,7 +58,7 @@ def remove_chp():
             logger.info("Cannot uninstall configurable-http-proxy...")
 
 
-def ensure_jupyterhub_service(prefix):
+def ensure_jupyterhub_service(usernames_prefix, hash_usernames):
     """
     Ensure JupyterHub Services are set up properly
     """
@@ -84,8 +84,8 @@ def ensure_jupyterhub_service(prefix):
         python_interpreter_path=sys.executable,
         jupyterhub_config_path=os.path.join(HERE, "jupyterhub_config.py"),
         install_prefix=INSTALL_PREFIX,
-        usernames_prefix=USERNAME_PREFIX,
-        hash_usernames=HASH_USERNAME
+        usernames_prefix=usernames_prefix,
+        hash_usernames=hash_usernames
     )
     systemd.install_unit("jupyterhub.service", hub_unit_template.format(**unit_params))
     systemd.install_unit("traefik.service", traefik_unit_template.format(**unit_params))
@@ -544,6 +544,8 @@ def main():
         type=int,
         help="The pid of the progress page server",
     )
+    argparser.add_argument("--usernames-prefix", default=USERNAME_PREFIX, help="Prefix for usernames, default is jupyter-")
+    argparser.add_argument("--hash-usernames", default=HASH_USERNAME, help="If usernames where are too large should be add a hash or trimed, default is True")
 
     args = argparser.parse_args()
 
@@ -578,7 +580,7 @@ def main():
         except Exception as e:
             logger.error(f"Couldn't stop the progress page server. Exception was {e}.")
 
-    ensure_jupyterhub_service(HUB_ENV_PREFIX)
+    ensure_jupyterhub_service(args.usernames_prefix, args.hash_usernames)
     ensure_jupyterhub_running()
     ensure_symlinks(HUB_ENV_PREFIX)
 

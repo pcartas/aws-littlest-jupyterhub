@@ -26,6 +26,8 @@ from .config import (
     INSTALL_PREFIX,
     STATE_DIR,
     USER_ENV_PREFIX,
+    HASH_USERNAME,
+    USERNAME_PREFIX,
 )
 from .utils import parse_version as V
 from .yaml import yaml
@@ -56,7 +58,7 @@ def remove_chp():
             logger.info("Cannot uninstall configurable-http-proxy...")
 
 
-def ensure_jupyterhub_service(prefix):
+def ensure_jupyterhub_service(usernames_prefix, hash_usernames):
     """
     Ensure JupyterHub Services are set up properly
     """
@@ -82,6 +84,8 @@ def ensure_jupyterhub_service(prefix):
         python_interpreter_path=sys.executable,
         jupyterhub_config_path=os.path.join(HERE, "jupyterhub_config.py"),
         install_prefix=INSTALL_PREFIX,
+        usernames_prefix=usernames_prefix,
+        hash_usernames=hash_usernames
     )
     systemd.install_unit("jupyterhub.service", hub_unit_template.format(**unit_params))
     systemd.install_unit("traefik.service", traefik_unit_template.format(**unit_params))
@@ -540,18 +544,23 @@ def main():
         type=int,
         help="The pid of the progress page server",
     )
+    argparser.add_argument("--usernames-prefix", default=USERNAME_PREFIX, help="Prefix for usernames, default is jupyter-")
+    argparser.add_argument("--hash-usernames", default=HASH_USERNAME, help="If usernames where are too large should be add a hash or trimed, default is True")
 
     args = argparser.parse_args()
 
     pm = setup_plugins(args.plugin)
 
     ensure_config_yaml(pm)
-    # Create a list with args.admin and args.admin_s3
+   
     admins = []
     if args.admin:
         admins.extend(args.admin)
-    if args.admin_s3:
-        admins.extend(args.admin_s3)
+    admin_s3_usernames = [admin_s3[0] for admin_s3 in args.admin_s3]
+    for admin in admin_s3_usernames:
+        if admin not in admins:
+            admins.append([admin])
+
     ensure_admins(admins)
     ensure_s3_mounts(args.admin_s3, args.iam_role)
     ensure_usergroups()
@@ -571,7 +580,7 @@ def main():
         except Exception as e:
             logger.error(f"Couldn't stop the progress page server. Exception was {e}.")
 
-    ensure_jupyterhub_service(HUB_ENV_PREFIX)
+    ensure_jupyterhub_service(args.usernames_prefix, args.hash_usernames.lower() == "true")
     ensure_jupyterhub_running()
     ensure_symlinks(HUB_ENV_PREFIX)
 
